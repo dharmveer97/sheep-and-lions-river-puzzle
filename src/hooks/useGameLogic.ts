@@ -197,6 +197,7 @@ export function useGameLogic() {
 
     if (boatAnimals.length >= 2) {
       setWarning('Boat is full! Maximum 2 animals.');
+      setDraggedAnimal(null);
       return false;
     }
 
@@ -208,7 +209,6 @@ export function useGameLogic() {
     });
 
     setDraggedAnimal(null);
-    setWarning('');
     return true;
   }, [draggedAnimal, getAnimalsAt]);
 
@@ -221,6 +221,7 @@ export function useGameLogic() {
 
       if (animalLocation === 'boat' && side !== boatPosition) {
         setWarning(`Boat is on the ${boatPosition} side!`);
+        setDraggedAnimal(null);
         return false;
       }
 
@@ -232,7 +233,6 @@ export function useGameLogic() {
       });
 
       setDraggedAnimal(null);
-      setWarning('');
       return true;
     },
     [draggedAnimal, animalLocations, boatPosition]
