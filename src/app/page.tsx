@@ -211,331 +211,302 @@ export default function RiverCrossingGame() {
   const rightAnimals = getAnimalsAt('right');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-300 via-sky-200 to-sky-100 flex flex-col items-center justify-center p-2 sm:p-4 overflow-x-hidden">
-      {/* Title */}
-      <motion.h1
-        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-3 sm:mb-6 text-center px-2"
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        🚣 River Crossing Puzzle 🦁🐑
-      </motion.h1>
+    <div className="fixed inset-0 bg-gradient-to-b from-sky-300 via-sky-200 to-sky-100 flex flex-col overflow-hidden">
+      {/* Top HUD */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-blue-900/90 to-blue-800/90 backdrop-blur-sm px-3 py-2 shadow-lg z-20">
+        <motion.h1
+          className="text-lg sm:text-2xl font-bold text-white text-center"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          🚣 River Crossing Puzzle
+        </motion.h1>
+      </div>
 
-      {/* Instructions */}
-      <motion.p
-        className="text-xs sm:text-sm md:text-base text-gray-700 mb-3 sm:mb-4 text-center max-w-3xl px-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <strong>Goal:</strong> Move all animals from LEFT to RIGHT side.{' '}
-        <strong>Rule:</strong> Lions can&apos;t outnumber sheep on either side!{' '}
-        <strong>Boat:</strong> 1-2 animals max.
-        <br />
-        <span className="text-blue-600 font-semibold text-xs">
-          📱 Mobile: Tap animal (blue), then tap destination (green outline)
-        </span>
-      </motion.p>
-
-      {/* Warning message with danger preview */}
-      <AnimatePresence mode="wait">
-        {warning && (
-          <motion.div
-            className="bg-red-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg mb-3 sm:mb-4 shadow-lg text-sm sm:text-base mx-4 max-w-md text-center border-2 border-red-700"
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-            }}
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <motion.span
-                animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
-                className="text-xl"
-              >
-                ⚠️
-              </motion.span>
-              <span>{warning}</span>
-              <motion.span
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
-                className="text-xl"
-              >
-                💀
-              </motion.span>
-            </div>
-            {dangerPreview && (
+      {/* Status HUD */}
+      <div className="flex-shrink-0 px-3 py-2 bg-black/20 backdrop-blur-sm z-20">
+        <div className="flex items-center justify-between gap-2">
+          <AnimatePresence mode="wait">
+            {warning ? (
               <motion.div
-                className="mt-2 text-xs sm:text-sm bg-red-700 px-3 py-1 rounded-md"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                key="warning"
+                className="flex-1 bg-red-500 text-white px-3 py-1.5 rounded-lg shadow-lg text-xs font-semibold flex items-center gap-2"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
               >
-                {dangerPreview.leftInDanger && (
-                  <div>⬅️ LEFT side: Sheep in danger!</div>
-                )}
-                {dangerPreview.rightInDanger && (
-                  <div>➡️ RIGHT side: Sheep in danger!</div>
-                )}
+                <span>⚠️</span>
+                <span className="flex-1">{warning}</span>
+              </motion.div>
+            ) : selectedAnimal ? (
+              <motion.div
+                key="selected"
+                className="flex-1 bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow-lg text-xs font-semibold"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+              >
+                {selectedAnimal.type === 'sheep' ? '🐑' : '🦁'} Selected - Tap
+                GREEN area
+              </motion.div>
+            ) : (
+              <motion.div
+                key="hint"
+                className="flex-1 bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                👆 Tap animals, move to boat, cross river →
               </motion.div>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </AnimatePresence>
+        </div>
+      </div>
 
-      {/* Selected Animal Indicator */}
-      <AnimatePresence>
-        {selectedAnimal && (
-          <motion.div
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg mb-2 shadow-lg text-sm font-semibold"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
-            <span className="text-lg">
-              {selectedAnimal.type === 'sheep' ? '🐑' : '🦁'}
-            </span>{' '}
-            Selected - Tap{' '}
-            <span className="text-green-300 font-bold">GREEN outlined</span>{' '}
-            area to move
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Game board */}
-      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6 px-2">
-        {/* Left Side */}
+      {/* Game World - Responsive Layout */}
+      <div className="flex-1 relative overflow-x-auto overflow-y-hidden lg:overflow-hidden">
         <motion.div
-          className={cn(
-            'bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 sm:p-6 min-h-[200px] sm:min-h-[300px] md:min-h-[420px] flex flex-col items-center justify-start border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
-            areSheepEaten(gameState.leftSheep, gameState.leftLions)
-              ? 'border-red-600 animate-pulse'
-              : dangerPreview?.leftInDanger
-                ? 'border-orange-500 border-dashed'
-                : 'border-green-900',
-            getLocationOutlineColor.left
-          )}
-          onClick={e => selectedAnimal && handleLocationClick('left', e)}
-          onDrop={() => handleDropToLand('left')}
-          onDragOver={handleDragOver}
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          className="h-full flex items-center justify-center px-4 gap-4 lg:gap-6 min-w-max lg:min-w-0 lg:max-w-7xl lg:mx-auto"
+          drag="x"
+          dragConstraints={{ left: -600, right: 0 }}
+          dragElastic={0.1}
+          dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
         >
-          <div className="relative w-full flex justify-center">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 bg-green-800 px-4 py-2 rounded-lg shadow-md">
-              ⬅️ LEFT SIDE (START)
-            </h2>
-            {dangerPreview?.leftInDanger && (
-              <motion.div
-                className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1, rotate: [0, -5, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 0.5 }}
-              >
-                ⚠️ DANGER
-              </motion.div>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center items-center flex-1 w-full p-4">
-            <AnimatePresence>
-              {leftAnimals.map(animal => renderAnimal(animal, 'left'))}
-            </AnimatePresence>
-          </div>
-          <div className="mt-3 sm:mt-4 text-white text-xs sm:text-sm bg-green-800 px-4 py-2 rounded-lg shadow-md">
-            <div>🐑 Sheep: {gameState.leftSheep}</div>
-            <div>🦁 Lions: {gameState.leftLions}</div>
-          </div>
-        </motion.div>
-
-        {/* River & Boat */}
-        <motion.div
-          className="bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 rounded-xl p-4 sm:p-6 min-h-[200px] sm:min-h-[300px] md:min-h-[420px] flex flex-col items-center justify-between relative overflow-hidden shadow-2xl"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          {/* River waves animation */}
-          <div className="absolute inset-0 opacity-30 pointer-events-none">
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-full h-6 sm:h-8 bg-blue-600 rounded-full blur-sm"
-                style={{ top: `${i * 18}%` }}
-                animate={{
-                  x: ['-100%', '100%'],
-                }}
-                transition={{
-                  duration: 3 + i * 0.5,
-                  repeat: Infinity,
-                  ease: 'linear',
-                }}
-              />
-            ))}
-          </div>
-
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white z-10 bg-blue-600 px-4 py-2 rounded-lg shadow-md">
-            🌊 RIVER
-          </h2>
-
-          {/* Boat - LARGER CLICKABLE AREA */}
+          {/* Left Side */}
           <motion.div
             className={cn(
-              'bg-gradient-to-br from-amber-600 to-amber-800 rounded-2xl p-4 sm:p-6 md:p-8 border-4 border-amber-900 min-h-[140px] sm:min-h-[180px] md:min-h-[240px] w-full max-w-sm flex flex-col items-center justify-center z-10 relative shadow-2xl cursor-pointer touch-manipulation',
-              boatAnimals.length === 0 && 'border-dashed border-amber-600',
-              dangerPreview && 'border-red-500 border-dashed',
-              getLocationOutlineColor.boat
+              'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
+              areSheepEaten(gameState.leftSheep, gameState.leftLions)
+                ? 'border-red-600 animate-pulse'
+                : dangerPreview?.leftInDanger
+                  ? 'border-orange-500 border-dashed'
+                  : 'border-green-900',
+              getLocationOutlineColor.left
             )}
-            onClick={e => selectedAnimal && handleLocationClick('boat', e)}
-            onDrop={handleDropInBoat}
+            onClick={e => selectedAnimal && handleLocationClick('left', e)}
+            onDrop={() => handleDropToLand('left')}
             onDragOver={handleDragOver}
-            animate={{
-              y: [0, -8, 0],
-              rotate: [0, 2, 0, -2, 0],
-              ...(dangerPreview && showDangerAnimation
-                ? { scale: [1, 0.95, 1], x: [-5, 5, -5, 5, 0] }
-                : {}),
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
-            <BoatIcon className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" />
-            <div className="text-white font-bold mb-3 z-10 text-base sm:text-lg bg-amber-900 px-4 py-2 rounded-md">
-              🚤 BOAT (Tap Here)
-            </div>
-            <div className="flex flex-wrap gap-3 justify-center z-10 min-h-[70px] sm:min-h-[90px] items-center w-full">
-              <AnimatePresence>
-                {boatAnimals.map(animal => renderAnimal(animal, 'boat'))}
-              </AnimatePresence>
-              {boatAnimals.length === 0 && (
-                <div className="text-amber-200 text-sm opacity-70">Empty</div>
+            <div className="relative w-full flex justify-center">
+              <h2 className="text-xl font-bold text-white bg-green-800 px-4 py-2 rounded-lg shadow-md">
+                ⬅️ START
+              </h2>
+              {dangerPreview?.leftInDanger && (
+                <motion.div
+                  className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1, rotate: [0, -5, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 0.5 }}
+                >
+                  ⚠️
+                </motion.div>
               )}
             </div>
-            <div className="mt-3 text-white text-sm sm:text-base z-10 bg-amber-900 px-4 py-2 rounded-md font-semibold">
-              {boatAnimals.length}/2 animals
+            <div className="flex flex-wrap gap-3 justify-center items-center flex-1 w-full p-4">
+              <AnimatePresence>
+                {leftAnimals.map(animal => renderAnimal(animal, 'left'))}
+              </AnimatePresence>
             </div>
-            {dangerPreview && boatAnimals.length > 0 && (
-              <motion.div
-                className="absolute -top-3 -right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-20"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1, rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              >
-                ⚠️ CHECK!
-              </motion.div>
-            )}
+            <div className="text-white text-sm bg-green-800 px-4 py-2 rounded-lg shadow-md">
+              <div>🐑 {gameState.leftSheep}</div>
+              <div>🦁 {gameState.leftLions}</div>
+            </div>
           </motion.div>
 
-          {/* Boat position indicator */}
+          {/* River & Boat */}
           <motion.div
-            className="text-white font-bold bg-blue-600 px-3 sm:px-4 py-1 sm:py-2 rounded-full z-10 shadow-lg text-xs sm:text-sm"
-            key={boatPosition}
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 200 }}
+            className="w-64 lg:w-80 lg:flex-1 h-full bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between relative overflow-hidden shadow-2xl"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            🚤 Boat at: {boatPosition.toUpperCase()}
-          </motion.div>
-        </motion.div>
+            {/* River waves animation */}
+            <div className="absolute inset-0 opacity-30 pointer-events-none">
+              {[...Array(8)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-full h-8 bg-blue-600 rounded-full blur-sm"
+                  style={{ top: `${i * 13}%` }}
+                  animate={{
+                    x: ['-100%', '100%'],
+                  }}
+                  transition={{
+                    duration: 3 + i * 0.5,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
+                />
+              ))}
+            </div>
 
-        {/* Right Side */}
-        <motion.div
-          className={cn(
-            'bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 sm:p-6 min-h-[200px] sm:min-h-[300px] md:min-h-[420px] flex flex-col items-center justify-start border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
-            areSheepEaten(gameState.rightSheep, gameState.rightLions)
-              ? 'border-red-600 animate-pulse'
-              : dangerPreview?.rightInDanger
-                ? 'border-orange-500 border-dashed'
-                : 'border-green-900',
-            getLocationOutlineColor.right
-          )}
-          onClick={e => selectedAnimal && handleLocationClick('right', e)}
-          onDrop={() => handleDropToLand('right')}
-          onDragOver={handleDragOver}
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="relative w-full flex justify-center">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 bg-green-800 px-4 py-2 rounded-lg shadow-md">
-              RIGHT SIDE ➡️ (GOAL)
+            <h2 className="text-xl font-bold text-white z-10 bg-blue-600 px-4 py-2 rounded-lg shadow-md">
+              🌊 RIVER
             </h2>
-            {dangerPreview?.rightInDanger && (
-              <motion.div
-                className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1, rotate: [0, -5, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 0.5 }}
-              >
-                ⚠️ DANGER
-              </motion.div>
+
+            {/* Boat */}
+            <motion.div
+              className={cn(
+                'bg-gradient-to-br from-amber-600 to-amber-800 rounded-2xl p-6 border-4 border-amber-900 w-full flex flex-col items-center justify-center z-10 relative shadow-2xl cursor-pointer touch-manipulation min-h-[250px]',
+                boatAnimals.length === 0 && 'border-dashed border-amber-600',
+                dangerPreview && 'border-red-500 border-dashed',
+                getLocationOutlineColor.boat
+              )}
+              onClick={e => selectedAnimal && handleLocationClick('boat', e)}
+              onDrop={handleDropInBoat}
+              onDragOver={handleDragOver}
+              animate={{
+                y: [0, -8, 0],
+                rotate: [0, 2, 0, -2, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            >
+              <BoatIcon className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" />
+              <div className="text-white font-bold mb-3 z-10 text-lg bg-amber-900 px-4 py-2 rounded-md">
+                🚤 BOAT
+              </div>
+              <div className="flex flex-wrap gap-3 justify-center z-10 min-h-[90px] items-center w-full">
+                <AnimatePresence>
+                  {boatAnimals.map(animal => renderAnimal(animal, 'boat'))}
+                </AnimatePresence>
+                {boatAnimals.length === 0 && (
+                  <div className="text-amber-200 text-sm opacity-70">Empty</div>
+                )}
+              </div>
+              <div className="mt-3 text-white text-sm z-10 bg-amber-900 px-4 py-2 rounded-md font-semibold">
+                {boatAnimals.length}/2
+              </div>
+              {dangerPreview && boatAnimals.length > 0 && (
+                <motion.div
+                  className="absolute -top-3 -right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-20"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1, rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                >
+                  ⚠️
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Boat position */}
+            <motion.div
+              className="text-white font-bold bg-blue-600 px-4 py-2 rounded-full z-10 shadow-lg text-sm"
+              key={boatPosition}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 200 }}
+            >
+              At: {boatPosition.toUpperCase()}
+            </motion.div>
+          </motion.div>
+
+          {/* Right Side */}
+          <motion.div
+            className={cn(
+              'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
+              areSheepEaten(gameState.rightSheep, gameState.rightLions)
+                ? 'border-red-600 animate-pulse'
+                : dangerPreview?.rightInDanger
+                  ? 'border-orange-500 border-dashed'
+                  : 'border-green-900',
+              getLocationOutlineColor.right
             )}
-          </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center items-center flex-1 w-full p-4">
-            <AnimatePresence>
-              {rightAnimals.map(animal => renderAnimal(animal, 'right'))}
-            </AnimatePresence>
-          </div>
-          <div className="mt-3 sm:mt-4 text-white text-xs sm:text-sm bg-green-800 px-4 py-2 rounded-lg shadow-md">
-            <div>🐑 Sheep: {gameState.rightSheep}</div>
-            <div>🦁 Lions: {gameState.rightLions}</div>
-          </div>
+            onClick={e => selectedAnimal && handleLocationClick('right', e)}
+            onDrop={() => handleDropToLand('right')}
+            onDragOver={handleDragOver}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <div className="relative w-full flex justify-center">
+              <h2 className="text-xl font-bold text-white bg-green-800 px-4 py-2 rounded-lg shadow-md">
+                GOAL ➡️
+              </h2>
+              {dangerPreview?.rightInDanger && (
+                <motion.div
+                  className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1, rotate: [0, -5, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 0.5 }}
+                >
+                  ⚠️
+                </motion.div>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-3 justify-center items-center flex-1 w-full p-4">
+              <AnimatePresence>
+                {rightAnimals.map(animal => renderAnimal(animal, 'right'))}
+              </AnimatePresence>
+            </div>
+            <div className="text-white text-sm bg-green-800 px-4 py-2 rounded-lg shadow-md">
+              <div>🐑 {gameState.rightSheep}</div>
+              <div>🦁 {gameState.rightLions}</div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Controls */}
-      <motion.div
-        className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-xl px-4"
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-      >
-        <motion.button
-          onClick={handleMoveBoat}
-          disabled={gameStatus !== 'playing' || isPending}
-          className={cn(
-            'flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 sm:py-5 px-6 sm:px-8 rounded-xl shadow-xl transition-all text-base sm:text-lg relative touch-manipulation',
-            (gameStatus !== 'playing' || isPending) &&
-              'cursor-not-allowed opacity-50',
-            dangerPreview && 'ring-4 ring-red-500 ring-opacity-50'
-          )}
-          whileHover={
-            gameStatus === 'playing' && !isPending ? { scale: 1.05 } : {}
-          }
-          whileTap={
-            gameStatus === 'playing' && !isPending ? { scale: 0.95 } : {}
-          }
+      {/* Bottom Controls HUD */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-gray-900/90 to-gray-800/90 backdrop-blur-sm px-3 py-3 shadow-lg z-20">
+        <motion.div
+          className="flex gap-3 justify-center"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
         >
-          {isPending ? '🚤 Moving...' : '🚤 Move Boat →'}
-          {dangerPreview && boatAnimals.length > 0 && !isPending && (
-            <motion.span
-              className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            >
-              ⚠️
-            </motion.span>
-          )}
-        </motion.button>
-        <motion.button
-          onClick={handleReset}
-          disabled={isPending}
-          className={cn(
-            'flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-4 sm:py-5 px-6 sm:px-8 rounded-xl shadow-xl transition-all text-base sm:text-lg touch-manipulation',
-            isPending && 'cursor-not-allowed opacity-50'
-          )}
-          whileHover={!isPending ? { scale: 1.05 } : {}}
-          whileTap={!isPending ? { scale: 0.95 } : {}}
-        >
-          🔄 Reset Game
-        </motion.button>
-      </motion.div>
+          <motion.button
+            onClick={handleMoveBoat}
+            disabled={gameStatus !== 'playing' || isPending}
+            className={cn(
+              'flex-1 max-w-xs bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-all text-sm relative touch-manipulation',
+              (gameStatus !== 'playing' || isPending) &&
+                'cursor-not-allowed opacity-50',
+              dangerPreview && 'ring-2 ring-red-500'
+            )}
+            whileHover={
+              gameStatus === 'playing' && !isPending ? { scale: 1.05 } : {}
+            }
+            whileTap={
+              gameStatus === 'playing' && !isPending ? { scale: 0.95 } : {}
+            }
+          >
+            {isPending ? (
+              '🚤 Moving...'
+            ) : (
+              <>🚤 Move Boat {boatPosition === 'left' ? '→ RIGHT' : '← LEFT'}</>
+            )}
+            {dangerPreview && boatAnimals.length > 0 && !isPending && (
+              <motion.span
+                className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                ⚠️
+              </motion.span>
+            )}
+          </motion.button>
+          <motion.button
+            onClick={handleReset}
+            disabled={isPending}
+            className={cn(
+              'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-all text-sm touch-manipulation',
+              isPending && 'cursor-not-allowed opacity-50'
+            )}
+            whileHover={!isPending ? { scale: 1.05 } : {}}
+            whileTap={!isPending ? { scale: 0.95 } : {}}
+          >
+            🔄 Reset
+          </motion.button>
+        </motion.div>
+      </div>
 
       {/* Win/Loss Modals */}
       <AnimatePresence>
