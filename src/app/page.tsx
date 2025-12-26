@@ -270,9 +270,14 @@ export default function RiverCrossingGame() {
         <motion.div
           className="h-full flex items-center justify-center px-4 gap-4 lg:gap-6 min-w-max lg:min-w-0 lg:max-w-7xl lg:mx-auto"
           drag="x"
-          dragConstraints={{ left: -600, right: 0 }}
-          dragElastic={0.1}
-          dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
+          dragConstraints={{ left: -800, right: 0 }}
+          dragElastic={0.05}
+          dragMomentum={true}
+          dragTransition={{
+            power: 0.3,
+            timeConstant: 200,
+            modifyTarget: target => Math.round(target / 50) * 50,
+          }}
         >
           {/* Left Side */}
           <motion.div
@@ -351,8 +356,10 @@ export default function RiverCrossingGame() {
             {/* Boat */}
             <motion.div
               className={cn(
-                'bg-gradient-to-br from-amber-600 to-amber-800 rounded-2xl p-6 border-4 border-amber-900 w-full flex flex-col items-center justify-center z-10 relative shadow-2xl cursor-pointer touch-manipulation min-h-[250px]',
-                boatAnimals.length === 0 && 'border-dashed border-amber-600',
+                'bg-gradient-to-br from-amber-500 via-amber-600 to-amber-800 rounded-3xl p-6 border-4 w-full flex flex-col items-center justify-center z-10 relative shadow-2xl cursor-pointer touch-manipulation min-h-[250px]',
+                boatAnimals.length === 0
+                  ? 'border-dashed border-amber-400/50'
+                  : 'border-amber-900',
                 dangerPreview && 'border-red-500 border-dashed',
                 getLocationOutlineColor.boat
               )}
@@ -369,21 +376,52 @@ export default function RiverCrossingGame() {
                 ease: 'easeInOut',
               }}
             >
-              <BoatIcon className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" />
-              <div className="text-white font-bold mb-3 z-10 text-lg bg-amber-900 px-4 py-2 rounded-md">
-                🚤 BOAT
+              {/* Boat Background */}
+              <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+                <BoatIcon className="absolute inset-0 w-full h-full opacity-10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 to-transparent" />
               </div>
-              <div className="flex flex-wrap gap-3 justify-center z-10 min-h-[90px] items-center w-full">
+
+              {/* Boat Header */}
+              <div className="text-white font-bold mb-3 z-10 text-lg bg-amber-900/80 backdrop-blur-sm px-5 py-2 rounded-full shadow-lg border-2 border-amber-700">
+                <span className="text-2xl">🚤</span>
+              </div>
+
+              {/* Animals Area */}
+              <div className="flex flex-wrap gap-3 justify-center z-10 min-h-[90px] items-center w-full p-3 bg-amber-800/30 backdrop-blur-sm rounded-2xl">
                 <AnimatePresence>
                   {boatAnimals.map(animal => renderAnimal(animal, 'boat'))}
                 </AnimatePresence>
                 {boatAnimals.length === 0 && (
-                  <div className="text-amber-200 text-sm opacity-70">Empty</div>
+                  <motion.div
+                    className="text-amber-100 text-sm font-medium flex flex-col items-center gap-1"
+                    animate={{
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <span className="text-2xl">👆</span>
+                    <span>Tap animals to add</span>
+                  </motion.div>
                 )}
               </div>
-              <div className="mt-3 text-white text-sm z-10 bg-amber-900 px-4 py-2 rounded-md font-semibold">
+
+              {/* Capacity Indicator */}
+              <div className="mt-3 text-white text-sm z-10 bg-amber-900/80 backdrop-blur-sm px-4 py-1.5 rounded-full font-semibold shadow-md border-2 border-amber-700">
+                <span className="text-base">
+                  {boatAnimals.length === 0
+                    ? '🌊'
+                    : boatAnimals.length === 1
+                      ? '⚓'
+                      : '⛵'}
+                </span>{' '}
                 {boatAnimals.length}/2
               </div>
+
               {dangerPreview && boatAnimals.length > 0 && (
                 <motion.div
                   className="absolute -top-3 -right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-20"
@@ -464,22 +502,33 @@ export default function RiverCrossingGame() {
         >
           <motion.button
             onClick={handleMoveBoat}
-            disabled={gameStatus !== 'playing' || isPending}
+            disabled={
+              gameStatus !== 'playing' || isPending || boatAnimals.length === 0
+            }
             className={cn(
-              'flex-1 max-w-xs bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-3 px-6 rounded-xl shadow-xl transition-all text-sm relative touch-manipulation',
+              'flex-1 max-w-xs font-bold py-3 px-6 rounded-xl shadow-xl transition-all text-sm relative touch-manipulation',
+              boatAnimals.length === 0
+                ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-gray-300 cursor-not-allowed opacity-60'
+                : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white',
               (gameStatus !== 'playing' || isPending) &&
                 'cursor-not-allowed opacity-50',
-              dangerPreview && 'ring-2 ring-red-500'
+              dangerPreview && boatAnimals.length > 0 && 'ring-2 ring-red-500'
             )}
             whileHover={
-              gameStatus === 'playing' && !isPending ? { scale: 1.05 } : {}
+              gameStatus === 'playing' && !isPending && boatAnimals.length > 0
+                ? { scale: 1.05 }
+                : {}
             }
             whileTap={
-              gameStatus === 'playing' && !isPending ? { scale: 0.95 } : {}
+              gameStatus === 'playing' && !isPending && boatAnimals.length > 0
+                ? { scale: 0.95 }
+                : {}
             }
           >
             {isPending ? (
               '🚤 Moving...'
+            ) : boatAnimals.length === 0 ? (
+              <>⛔ Add animals to boat first</>
             ) : (
               <>🚤 Move Boat {boatPosition === 'left' ? '→ RIGHT' : '← LEFT'}</>
             )}
