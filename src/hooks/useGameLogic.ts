@@ -306,6 +306,7 @@ export function useGameLogic() {
     showDangerAnimation,
     isPending,
     initialAnimals,
+    animalLocations,
 
     // Computed
     getAnimalsAt,
@@ -317,5 +318,6 @@ export function useGameLogic() {
     handleDropToLand,
     handleMoveBoat,
     handleReset,
+    setDraggedAnimal,
   };
 }

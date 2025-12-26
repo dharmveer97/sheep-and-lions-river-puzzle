@@ -25,6 +25,7 @@ export default function RiverCrossingGame() {
     handleDropToLand,
     handleMoveBoat,
     handleReset,
+    setDraggedAnimal,
   } = useGameLogic();
 
   // Mobile: selected animal for tap-to-move
@@ -46,6 +47,7 @@ export default function RiverCrossingGame() {
     if (selectedAnimal?.id === animal.id) {
       setSelectedAnimal(null);
       setSelectedAnimalLocation(null);
+      setDraggedAnimal(null); // Clear draggedAnimal too
       return;
     }
 
@@ -56,6 +58,7 @@ export default function RiverCrossingGame() {
 
     setSelectedAnimal(animal);
     setSelectedAnimalLocation(currentLocation);
+    setDraggedAnimal(animal); // Sync with hook's draggedAnimal
   };
 
   // Handle location click (mobile friendly)
