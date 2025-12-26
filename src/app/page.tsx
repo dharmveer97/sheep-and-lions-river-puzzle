@@ -266,23 +266,19 @@ export default function RiverCrossingGame() {
       </div>
 
       {/* Game World - Responsive Layout */}
-      <div className="flex-1 relative overflow-x-auto overflow-y-hidden lg:overflow-hidden">
-        <motion.div
-          className="h-full flex items-center justify-center px-4 gap-4 lg:gap-6 min-w-max lg:min-w-0 lg:max-w-7xl lg:mx-auto"
-          drag="x"
-          dragConstraints={{ left: -800, right: 0 }}
-          dragElastic={0.05}
-          dragMomentum={true}
-          dragTransition={{
-            power: 0.3,
-            timeConstant: 200,
-            modifyTarget: target => Math.round(target / 50) * 50,
-          }}
-        >
+      <div
+        className="flex-1 relative overflow-x-auto overflow-y-hidden lg:overflow-hidden"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x proximity',
+          scrollBehavior: 'smooth',
+        }}
+      >
+        <div className="h-full flex items-center justify-center px-4 gap-4 lg:gap-6 min-w-max lg:min-w-0 lg:max-w-7xl lg:mx-auto">
           {/* Left Side */}
           <motion.div
             className={cn(
-              'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
+              'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation flex-shrink-0',
               areSheepEaten(gameState.leftSheep, gameState.leftLions)
                 ? 'border-red-600 animate-pulse'
                 : dangerPreview?.leftInDanger
@@ -325,7 +321,7 @@ export default function RiverCrossingGame() {
 
           {/* River & Boat */}
           <motion.div
-            className="w-64 lg:w-80 lg:flex-1 h-full bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between relative overflow-hidden shadow-2xl"
+            className="w-64 lg:w-80 lg:flex-1 h-full bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between relative overflow-hidden shadow-2xl flex-shrink-0"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -449,7 +445,7 @@ export default function RiverCrossingGame() {
           {/* Right Side */}
           <motion.div
             className={cn(
-              'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
+              'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation flex-shrink-0',
               areSheepEaten(gameState.rightSheep, gameState.rightLions)
                 ? 'border-red-600 animate-pulse'
                 : dangerPreview?.rightInDanger
@@ -489,7 +485,7 @@ export default function RiverCrossingGame() {
               <div>🦁 {gameState.rightLions}</div>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom Controls HUD */}
