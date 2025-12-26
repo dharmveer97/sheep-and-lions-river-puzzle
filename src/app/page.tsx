@@ -1,12 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SheepIcon from '@/components/SheepIcon';
 import LionIcon from '@/components/LionIcon';
 import BoatIcon from '@/components/BoatIcon';
 import { areSheepEaten } from '@/utils/gameLogic';
 import { cn } from '@/lib/utils';
-import { useGameLogic, type Animal, type Location } from '@/hooks/useGameLogic';
+import { useGameLogic, type Animal } from '@/hooks/useGameLogic';
 
 export default function RiverCrossingGame() {
   const {
@@ -26,30 +27,67 @@ export default function RiverCrossingGame() {
     handleReset,
   } = useGameLogic();
 
+  // Mobile: selected animal for tap-to-move
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
+
   // Prevent default drag over
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
+  // Handle animal click/tap (mobile friendly)
+  const handleAnimalClick = (animal: Animal, currentLocation: string) => {
+    if (gameStatus !== 'playing') return;
+
+    // If already selected, deselect
+    if (selectedAnimal?.id === animal.id) {
+      setSelectedAnimal(null);
+      return;
+    }
+
+    // Check if animal is accessible
+    if (currentLocation !== 'boat' && currentLocation !== boatPosition) {
+      return;
+    }
+
+    setSelectedAnimal(animal);
+  };
+
+  // Handle location click (mobile friendly)
+  const handleLocationClick = (location: 'left' | 'right' | 'boat') => {
+    if (!selectedAnimal || gameStatus !== 'playing') return;
+
+    if (location === 'boat') {
+      handleDropInBoat();
+      setSelectedAnimal(null);
+    } else {
+      handleDropToLand(location);
+      setSelectedAnimal(null);
+    }
+  };
+
   // Render an animal component
-  const renderAnimal = (animal: Animal) => {
+  const renderAnimal = (animal: Animal, currentLocation: string) => {
     const inDanger = isAnimalInDanger(animal);
+    const isSelected = selectedAnimal?.id === animal.id;
 
     return (
       <motion.div
         key={animal.id}
         draggable={gameStatus === 'playing'}
         onDragStart={() => handleDragStart(animal)}
+        onClick={() => handleAnimalClick(animal, currentLocation)}
         className={cn(
-          'cursor-move select-none relative',
-          gameStatus !== 'playing' && 'cursor-not-allowed opacity-50'
+          'cursor-pointer select-none relative touch-manipulation',
+          gameStatus !== 'playing' && 'cursor-not-allowed opacity-50',
+          isSelected && 'ring-4 ring-yellow-400 rounded-full'
         )}
         whileHover={gameStatus === 'playing' ? { scale: 1.1 } : {}}
         whileTap={gameStatus === 'playing' ? { scale: 0.95 } : {}}
         initial={{ opacity: 0, scale: 0 }}
         animate={{
           opacity: 1,
-          scale: 1,
+          scale: isSelected ? 1.15 : 1,
           ...(inDanger && showDangerAnimation
             ? {
                 rotate: [0, -5, 5, -5, 5, 0],
@@ -63,6 +101,22 @@ export default function RiverCrossingGame() {
           repeat: inDanger && showDangerAnimation ? 2 : 0,
         }}
       >
+        {/* Selection indicator */}
+        {isSelected && (
+          <motion.div
+            className="absolute inset-0 rounded-full bg-yellow-400 -z-10"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 1,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        )}
+
         {/* Danger indicator */}
         <AnimatePresence>
           {inDanger && (
@@ -132,6 +186,10 @@ export default function RiverCrossingGame() {
         <strong>Goal:</strong> Move all animals from LEFT to RIGHT side.{' '}
         <strong>Rule:</strong> Lions can&apos;t outnumber sheep on either side!{' '}
         <strong>Boat:</strong> 1-2 animals max.
+        <br />
+        <span className="text-blue-600 font-semibold text-xs">
+          📱 Mobile: Tap animal, then tap destination
+        </span>
       </motion.p>
 
       {/* Warning message with danger preview */}
@@ -182,18 +240,33 @@ export default function RiverCrossingGame() {
         )}
       </AnimatePresence>
 
+      {/* Selected Animal Indicator */}
+      {selectedAnimal && (
+        <motion.div
+          className="bg-yellow-500 text-white px-4 py-2 rounded-lg mb-2 shadow-lg text-sm font-semibold"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+        >
+          Selected: {selectedAnimal.type === 'sheep' ? '🐑 Sheep' : '🦁 Lion'} -
+          Tap destination to move
+        </motion.div>
+      )}
+
       {/* Game board */}
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6 px-2">
         {/* Left Side */}
         <motion.div
           className={cn(
-            'bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 sm:p-6 min-h-[180px] sm:min-h-[280px] md:min-h-[420px] flex flex-col items-center justify-start border-4 shadow-2xl transition-all duration-300',
+            'bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 sm:p-6 min-h-[180px] sm:min-h-[280px] md:min-h-[420px] flex flex-col items-center justify-start border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
             areSheepEaten(gameState.leftSheep, gameState.leftLions)
               ? 'border-red-600 animate-pulse'
               : dangerPreview?.leftInDanger
                 ? 'border-orange-500 border-dashed'
-                : 'border-green-900'
+                : 'border-green-900',
+            selectedAnimal && 'ring-4 ring-yellow-400'
           )}
+          onClick={() => selectedAnimal && handleLocationClick('left')}
           onDrop={() => handleDropToLand('left')}
           onDragOver={handleDragOver}
           initial={{ x: -100, opacity: 0 }}
@@ -228,7 +301,7 @@ export default function RiverCrossingGame() {
 
         {/* River & Boat */}
         <motion.div
-          className="bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 rounded-xl p-4 sm:p-6 min-h-[180px] sm:min-h-[280px] md:min-h-[420px] flex flex-col items-center justify-between relative overflow-hidden shadow-2xl md:order-none order-last"
+          className="bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 rounded-xl p-4 sm:p-6 min-h-[180px] sm:min-h-[280px] md:min-h-[420px] flex flex-col items-center justify-between relative overflow-hidden shadow-2xl"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -259,10 +332,12 @@ export default function RiverCrossingGame() {
           {/* Boat */}
           <motion.div
             className={cn(
-              'bg-gradient-to-br from-amber-600 to-amber-800 rounded-2xl p-3 sm:p-4 md:p-6 border-4 border-amber-900 min-h-[120px] sm:min-h-[160px] md:min-h-[220px] w-full max-w-sm flex flex-col items-center justify-center z-10 relative shadow-2xl',
+              'bg-gradient-to-br from-amber-600 to-amber-800 rounded-2xl p-3 sm:p-4 md:p-6 border-4 border-amber-900 min-h-[120px] sm:min-h-[160px] md:min-h-[220px] w-full max-w-sm flex flex-col items-center justify-center z-10 relative shadow-2xl cursor-pointer touch-manipulation',
               boatAnimals.length === 0 && 'border-dashed border-amber-600',
-              dangerPreview && 'border-red-500 border-dashed'
+              dangerPreview && 'border-red-500 border-dashed',
+              selectedAnimal && 'ring-4 ring-yellow-400'
             )}
+            onClick={() => selectedAnimal && handleLocationClick('boat')}
             onDrop={handleDropInBoat}
             onDragOver={handleDragOver}
             animate={{
@@ -317,13 +392,15 @@ export default function RiverCrossingGame() {
         {/* Right Side */}
         <motion.div
           className={cn(
-            'bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 sm:p-6 min-h-[180px] sm:min-h-[280px] md:min-h-[420px] flex flex-col items-center justify-start border-4 shadow-2xl transition-all duration-300',
+            'bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 sm:p-6 min-h-[180px] sm:min-h-[280px] md:min-h-[420px] flex flex-col items-center justify-start border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation',
             areSheepEaten(gameState.rightSheep, gameState.rightLions)
               ? 'border-red-600 animate-pulse'
               : dangerPreview?.rightInDanger
                 ? 'border-orange-500 border-dashed'
-                : 'border-green-900'
+                : 'border-green-900',
+            selectedAnimal && 'ring-4 ring-yellow-400'
           )}
+          onClick={() => selectedAnimal && handleLocationClick('right')}
           onDrop={() => handleDropToLand('right')}
           onDragOver={handleDragOver}
           initial={{ x: 100, opacity: 0 }}
@@ -368,7 +445,7 @@ export default function RiverCrossingGame() {
           onClick={handleMoveBoat}
           disabled={gameStatus !== 'playing' || isPending}
           className={cn(
-            'flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl transition-all text-sm sm:text-base relative',
+            'flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl transition-all text-sm sm:text-base relative touch-manipulation',
             (gameStatus !== 'playing' || isPending) &&
               'cursor-not-allowed opacity-50',
             dangerPreview && 'ring-4 ring-red-500 ring-opacity-50'
@@ -395,7 +472,7 @@ export default function RiverCrossingGame() {
           onClick={handleReset}
           disabled={isPending}
           className={cn(
-            'flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl transition-all text-sm sm:text-base',
+            'flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-xl transition-all text-sm sm:text-base touch-manipulation',
             isPending && 'cursor-not-allowed opacity-50'
           )}
           whileHover={!isPending ? { scale: 1.05 } : {}}
@@ -440,7 +517,7 @@ export default function RiverCrossingGame() {
               </p>
               <motion.button
                 onClick={handleReset}
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-sm sm:text-base"
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-sm sm:text-base touch-manipulation"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -483,7 +560,7 @@ export default function RiverCrossingGame() {
               </p>
               <motion.button
                 onClick={handleReset}
-                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-sm sm:text-base"
+                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-sm sm:text-base touch-manipulation"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
