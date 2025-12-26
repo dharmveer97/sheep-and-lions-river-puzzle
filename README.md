@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# River Crossing Game
+
+An interactive, animated puzzle game built with Next.js, React, TypeScript, Tailwind CSS, and Framer Motion.
+
+## Game Description
+
+A classic river crossing puzzle where you must safely transport 3 sheep and 3 lions across a river using a boat.
+
+## Rules
+
+1. **Starting Position**: All animals start on the LEFT side
+2. **Goal**: Move all 6 animals to the RIGHT side
+3. **Boat Capacity**: The boat can carry 1-2 animals at a time
+4. **Critical Rule**: Lions must NEVER outnumber sheep on either side of the river (unless there are no sheep on that side)
+5. **Win Condition**: Successfully move all 6 animals to the RIGHT side
+6. **Lose Condition**: If lions outnumber sheep on either side, the sheep get eaten - Game Over!
+
+## How to Play
+
+1. **Drag & Drop**: Drag animals from land into the boat
+2. **Load Boat**: Add 1-2 animals to the boat (from the side where the boat is located)
+3. **Move Boat**: Click "Move Boat" button to cross the river
+4. **Unload**: Boat automatically unloads animals when it reaches the other side
+5. **Plan Ahead**: Think carefully about each move to avoid the sheep being eaten!
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Animations**: Framer Motion
+- **Icons**: Custom SVG components
+
+## Features
+
+- Real-time drag & drop gameplay
+- Smooth animations with Framer Motion
+- Mobile responsive design
+- Visual feedback for invalid moves
+- Win/Loss modal animations
+- Animated river waves
+- Floating boat animation
+- Custom SVG animal icons
+
+## Project Structure
+
+```
+src/
+├── app/
+│   └── page.tsx          # Main game component
+├── components/
+│   ├── SheepIcon.tsx     # Sheep SVG component
+│   ├── LionIcon.tsx      # Lion SVG component
+│   └── BoatIcon.tsx      # Boat SVG component
+├── types/
+│   └── game.ts           # TypeScript type definitions
+└── utils/
+    └── gameLogic.ts      # Game logic and validation
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Open browser
+# Navigate to http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Development Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
+npm run format       # Format code with Prettier
+npm run format:check # Check code formatting
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Game Strategy Tips
 
-## Learn More
+1. Start by moving 2 lions to the left
+2. Bring 1 lion back to the right
+3. Move 2 sheep to the left
+4. Continue alternating to maintain balance
+5. Never leave more lions than sheep on either side!
 
-To learn more about Next.js, take a look at the following resources:
+## Browser Support
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Modern browsers with HTML5 Drag & Drop support
+- Mobile browsers (touch events supported)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+MIT
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with ❤️ using Next.js and Framer Motion
