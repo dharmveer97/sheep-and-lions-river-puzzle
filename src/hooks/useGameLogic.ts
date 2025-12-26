@@ -191,14 +191,13 @@ export function useGameLogic() {
 
   // Handle drop into boat
   const handleDropInBoat = useCallback(() => {
-    if (!draggedAnimal) return;
+    if (!draggedAnimal) return false;
 
     const boatAnimals = getAnimalsAt('boat');
 
     if (boatAnimals.length >= 2) {
       setWarning('Boat is full! Maximum 2 animals.');
-      setDraggedAnimal(null);
-      return;
+      return false;
     }
 
     startTransition(() => {
@@ -209,19 +208,20 @@ export function useGameLogic() {
     });
 
     setDraggedAnimal(null);
+    setWarning('');
+    return true;
   }, [draggedAnimal, getAnimalsAt]);
 
   // Handle drop to land
   const handleDropToLand = useCallback(
     (side: 'left' | 'right') => {
-      if (!draggedAnimal) return;
+      if (!draggedAnimal) return false;
 
       const animalLocation = animalLocations[draggedAnimal.id];
 
       if (animalLocation === 'boat' && side !== boatPosition) {
         setWarning(`Boat is on the ${boatPosition} side!`);
-        setDraggedAnimal(null);
-        return;
+        return false;
       }
 
       startTransition(() => {
@@ -232,6 +232,8 @@ export function useGameLogic() {
       });
 
       setDraggedAnimal(null);
+      setWarning('');
+      return true;
     },
     [draggedAnimal, animalLocations, boatPosition]
   );

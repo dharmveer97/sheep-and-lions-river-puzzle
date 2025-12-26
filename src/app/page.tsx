@@ -71,12 +71,15 @@ export default function RiverCrossingGame() {
 
     if (!selectedAnimal || gameStatus !== 'playing') return;
 
+    let success = false;
     if (location === 'boat') {
-      handleDropInBoat();
-      setSelectedAnimal(null);
-      setSelectedAnimalLocation(null);
+      success = handleDropInBoat();
     } else {
-      handleDropToLand(location);
+      success = handleDropToLand(location);
+    }
+
+    // Only clear selection if drop succeeded
+    if (success) {
       setSelectedAnimal(null);
       setSelectedAnimalLocation(null);
     }
