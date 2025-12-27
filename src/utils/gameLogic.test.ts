@@ -435,14 +435,22 @@ describe('Game Logic Tests', () => {
 
       console.log('\n=== MOVE 5 TEST: 2 sheep → RIGHT ===');
       console.log('Current state:');
-      console.log(`  LEFT: ${move5State.leftSheep}🐑 ${move5State.leftLions}🦁`);
-      console.log(`  BOAT: ${move5State.boatSheep}🐑 ${move5State.boatLions}🦁`);
-      console.log(`  RIGHT: ${move5State.rightSheep}🐑 ${move5State.rightLions}🦁`);
+      console.log(
+        `  LEFT: ${move5State.leftSheep}🐑 ${move5State.leftLions}🦁`
+      );
+      console.log(
+        `  BOAT: ${move5State.boatSheep}🐑 ${move5State.boatLions}🦁`
+      );
+      console.log(
+        `  RIGHT: ${move5State.rightSheep}🐑 ${move5State.rightLions}🦁`
+      );
       console.log(`  Boat at: ${move5State.boatPosition}`);
 
       const validation = wouldMoveBeValid(move5State);
 
-      console.log(`\nValidation: ${validation.valid ? '✅ VALID' : '❌ INVALID - ' + validation.reason}`);
+      console.log(
+        `\nValidation: ${validation.valid ? '✅ VALID' : '❌ INVALID - ' + validation.reason}`
+      );
 
       if (validation.valid) {
         console.log('After move:');

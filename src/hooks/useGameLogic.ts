@@ -1,4 +1,4 @@
-import { useState, useMemo, useTransition, useCallback } from 'react';
+import { useState, useMemo, useEffect, useTransition, useCallback } from 'react';
 import { GameState, AnimalType } from '@/types/game';
 import {
   checkGameOver,
@@ -156,8 +156,8 @@ export function useGameLogic() {
     [dangerPreview, animalLocations, boatPosition]
   );
 
-  // Check win/loss after every move - memoized
-  useMemo(() => {
+  // Check win/loss after every move - using useEffect to run AFTER state updates complete
+  useEffect(() => {
     if (gameStatus !== 'playing') return;
 
     // Log every state change for debugging
@@ -173,24 +173,18 @@ export function useGameLogic() {
 
     if (checkWinCondition(gameState)) {
       console.log('🎉 WIN DETECTED!', gameState);
-      startTransition(() => {
-        setGameStatus('won');
-      });
+      setGameStatus('won');
     } else if (checkGameOver(gameState)) {
       console.log('💀 LOSS DETECTED!');
       console.log('Game State:', gameState);
       console.log(
         `LEFT: ${gameState.leftSheep}🐑 ${gameState.leftLions}🦁 - Eaten: ${areSheepEaten(gameState.leftSheep, gameState.leftLions)}`
       );
-      console.log(
-        `BOAT: ${gameState.boatSheep}🐑 ${gameState.boatLions}🦁`
-      );
+      console.log(`BOAT: ${gameState.boatSheep}🐑 ${gameState.boatLions}🦁`);
       console.log(
         `RIGHT: ${gameState.rightSheep}🐑 ${gameState.rightLions}🦁 - Eaten: ${areSheepEaten(gameState.rightSheep, gameState.rightLions)}`
       );
-      startTransition(() => {
-        setGameStatus('lost');
-      });
+      setGameStatus('lost');
     } else {
       console.log('✅ State is safe, continuing play');
     }
