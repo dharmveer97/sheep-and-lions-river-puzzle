@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SheepIcon from '@/components/SheepIcon';
 import LionIcon from '@/components/LionIcon';
@@ -33,6 +33,34 @@ export default function RiverCrossingGame() {
   const [selectedAnimalLocation, setSelectedAnimalLocation] = useState<
     string | null
   >(null);
+
+  // Refs for auto-scrolling
+  const leftRef = useRef<HTMLDivElement>(null);
+  const boatRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll when boat position changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const scrollToElement = (ref: React.RefObject<HTMLDivElement>) => {
+        if (ref.current) {
+          ref.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center',
+          });
+        }
+      };
+
+      // Scroll to the side where boat is
+      if (boatPosition === 'left') {
+        setTimeout(() => scrollToElement(leftRef), 300);
+      } else {
+        setTimeout(() => scrollToElement(rightRef), 300);
+      }
+    }
+  }, [boatPosition]);
 
   // Prevent default drag over
   const handleDragOver = (e: React.DragEvent) => {
@@ -82,6 +110,17 @@ export default function RiverCrossingGame() {
     if (success) {
       setSelectedAnimal(null);
       setSelectedAnimalLocation(null);
+
+      // Auto-scroll to boat when animal is added to it
+      if (location === 'boat' && boatRef.current) {
+        setTimeout(() => {
+          boatRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center',
+          });
+        }, 100);
+      }
     }
   };
 
@@ -267,6 +306,7 @@ export default function RiverCrossingGame() {
 
       {/* Game World - Responsive Layout */}
       <div
+        ref={scrollContainerRef}
         className="flex-1 relative overflow-x-auto overflow-y-hidden lg:overflow-hidden"
         style={{
           WebkitOverflowScrolling: 'touch',
@@ -277,6 +317,7 @@ export default function RiverCrossingGame() {
         <div className="h-full flex items-center justify-center px-4 gap-4 lg:gap-6 min-w-max lg:min-w-0 lg:max-w-7xl lg:mx-auto">
           {/* Left Side */}
           <motion.div
+            ref={leftRef}
             className={cn(
               'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation flex-shrink-0',
               areSheepEaten(gameState.leftSheep, gameState.leftLions)
@@ -321,6 +362,7 @@ export default function RiverCrossingGame() {
 
           {/* River & Boat */}
           <motion.div
+            ref={boatRef}
             className="w-64 lg:w-80 lg:flex-1 h-full bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between relative overflow-hidden shadow-2xl flex-shrink-0"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -444,6 +486,7 @@ export default function RiverCrossingGame() {
 
           {/* Right Side */}
           <motion.div
+            ref={rightRef}
             className={cn(
               'w-72 lg:w-96 lg:flex-1 h-full bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 lg:p-6 flex flex-col items-center justify-between border-4 shadow-2xl transition-all duration-300 cursor-pointer touch-manipulation flex-shrink-0',
               areSheepEaten(gameState.rightSheep, gameState.rightLions)
