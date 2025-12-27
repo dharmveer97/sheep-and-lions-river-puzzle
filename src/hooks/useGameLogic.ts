@@ -160,16 +160,39 @@ export function useGameLogic() {
   useMemo(() => {
     if (gameStatus !== 'playing') return;
 
+    // Log every state change for debugging
+    console.log('🔍 AUTO CHECK - Current game state:');
+    console.log(
+      `  LEFT: ${gameState.leftSheep}🐑 ${gameState.leftLions}🦁 - Safe: ${!areSheepEaten(gameState.leftSheep, gameState.leftLions)}`
+    );
+    console.log(`  BOAT: ${gameState.boatSheep}🐑 ${gameState.boatLions}🦁`);
+    console.log(
+      `  RIGHT: ${gameState.rightSheep}🐑 ${gameState.rightLions}🦁 - Safe: ${!areSheepEaten(gameState.rightSheep, gameState.rightLions)}`
+    );
+    console.log(`  Boat position: ${gameState.boatPosition}`);
+
     if (checkWinCondition(gameState)) {
       console.log('🎉 WIN DETECTED!', gameState);
       startTransition(() => {
         setGameStatus('won');
       });
     } else if (checkGameOver(gameState)) {
-      console.log('💀 LOSS DETECTED!', gameState);
+      console.log('💀 LOSS DETECTED!');
+      console.log('Game State:', gameState);
+      console.log(
+        `LEFT: ${gameState.leftSheep}🐑 ${gameState.leftLions}🦁 - Eaten: ${areSheepEaten(gameState.leftSheep, gameState.leftLions)}`
+      );
+      console.log(
+        `BOAT: ${gameState.boatSheep}🐑 ${gameState.boatLions}🦁`
+      );
+      console.log(
+        `RIGHT: ${gameState.rightSheep}🐑 ${gameState.rightLions}🦁 - Eaten: ${areSheepEaten(gameState.rightSheep, gameState.rightLions)}`
+      );
       startTransition(() => {
         setGameStatus('lost');
       });
+    } else {
+      console.log('✅ State is safe, continuing play');
     }
   }, [gameState, gameStatus]);
 
@@ -240,20 +263,35 @@ export function useGameLogic() {
 
   // Handle boat movement
   const handleMoveBoat = useCallback(() => {
+    console.log('\n🚢 MOVE BOAT CLICKED - Starting validation...');
+    console.log('Current state before move:');
+    console.log(`  LEFT: ${gameState.leftSheep}🐑 ${gameState.leftLions}🦁`);
+    console.log(`  BOAT: ${gameState.boatSheep}🐑 ${gameState.boatLions}🦁`);
+    console.log(`  RIGHT: ${gameState.rightSheep}🐑 ${gameState.rightLions}🦁`);
+    console.log(`  Boat at: ${gameState.boatPosition}`);
+
     // Validate state with Zod
     try {
       GameStateSchema.parse(gameState);
     } catch {
+      console.log('❌ Zod validation failed');
       setWarning('Invalid game state!');
       return;
     }
 
     if (!validateTotalAnimals(gameState)) {
+      console.log('❌ Total animals validation failed');
       setWarning('Invalid number of animals!');
       return;
     }
 
     const validationResult = wouldMoveBeValid(gameState);
+    console.log(
+      `Validation result: ${validationResult.valid ? '✅ VALID' : '❌ INVALID'}`
+    );
+    if (!validationResult.valid) {
+      console.log(`Reason: ${validationResult.reason}`);
+    }
 
     if (!validationResult.valid) {
       setWarning(validationResult.reason || 'Invalid move!');
@@ -261,6 +299,8 @@ export function useGameLogic() {
       setTimeout(() => setShowDangerAnimation(false), 2000);
       return;
     }
+
+    console.log('✅ Move validation passed, executing move...');
 
     const newPosition = boatPosition === 'left' ? 'right' : 'left';
     const boatAnimals = getAnimalsAt('boat');

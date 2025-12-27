@@ -412,5 +412,45 @@ describe('Game Logic Tests', () => {
       expect(checkGameOver(state)).toBe(true);
       expect(checkWinCondition(state)).toBe(false);
     });
+
+    it('should validate Move 5 of the 11-step solution (2 sheep to RIGHT)', () => {
+      // State after Move 4 completed: 3🐑 1🦁 on LEFT, 0🐑 2🦁 on RIGHT
+      const stateAfterMove4: GameState = {
+        leftSheep: 3,
+        leftLions: 1,
+        rightSheep: 0,
+        rightLions: 2,
+        boatSheep: 0,
+        boatLions: 0,
+        boatPosition: 'left',
+        gameStatus: 'playing',
+      };
+
+      // Load 2 sheep into boat for Move 5
+      const move5State: GameState = {
+        ...stateAfterMove4,
+        leftSheep: 1, // 3 - 2 = 1 sheep left on LEFT
+        boatSheep: 2, // 2 sheep in boat
+      };
+
+      console.log('\n=== MOVE 5 TEST: 2 sheep → RIGHT ===');
+      console.log('Current state:');
+      console.log(`  LEFT: ${move5State.leftSheep}🐑 ${move5State.leftLions}🦁`);
+      console.log(`  BOAT: ${move5State.boatSheep}🐑 ${move5State.boatLions}🦁`);
+      console.log(`  RIGHT: ${move5State.rightSheep}🐑 ${move5State.rightLions}🦁`);
+      console.log(`  Boat at: ${move5State.boatPosition}`);
+
+      const validation = wouldMoveBeValid(move5State);
+
+      console.log(`\nValidation: ${validation.valid ? '✅ VALID' : '❌ INVALID - ' + validation.reason}`);
+
+      if (validation.valid) {
+        console.log('After move:');
+        console.log(`  LEFT: 1🐑 1🦁 (equal, safe)`);
+        console.log(`  RIGHT: 2🐑 2🦁 (equal, safe)\n`);
+      }
+
+      expect(validation.valid).toBe(true);
+    });
   });
 });
