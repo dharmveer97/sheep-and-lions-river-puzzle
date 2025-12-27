@@ -43,9 +43,11 @@ export default function RiverCrossingGame() {
   // Auto-scroll when boat position changes
   useEffect(() => {
     if (scrollContainerRef.current) {
-      const scrollToElement = (ref: React.RefObject<HTMLDivElement>) => {
-        if (ref.current) {
-          ref.current.scrollIntoView({
+      const scrollToElement = (
+        element: HTMLDivElement | null | undefined
+      ) => {
+        if (element) {
+          element.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest',
             inline: 'center',
@@ -55,9 +57,9 @@ export default function RiverCrossingGame() {
 
       // Scroll to the side where boat is
       if (boatPosition === 'left') {
-        setTimeout(() => scrollToElement(leftRef), 300);
+        setTimeout(() => scrollToElement(leftRef.current), 300);
       } else {
-        setTimeout(() => scrollToElement(rightRef), 300);
+        setTimeout(() => scrollToElement(rightRef.current), 300);
       }
     }
   }, [boatPosition]);
@@ -112,14 +114,17 @@ export default function RiverCrossingGame() {
       setSelectedAnimalLocation(null);
 
       // Auto-scroll to boat when animal is added to it
-      if (location === 'boat' && boatRef.current) {
-        setTimeout(() => {
-          boatRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center',
-          });
-        }, 100);
+      if (location === 'boat') {
+        const element = boatRef.current;
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+              inline: 'center',
+            });
+          }, 100);
+        }
       }
     }
   };
