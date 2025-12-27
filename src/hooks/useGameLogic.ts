@@ -97,40 +97,11 @@ export function useGameLogic() {
     return state;
   }, [animalLocations, boatPosition, gameStatus]);
 
-  // Calculate danger preview - memoized
+  // Danger preview disabled - validation only happens when clicking "Move Boat"
+  // This prevents false warnings while user is still loading animals into boat
   const dangerPreview = useMemo((): DangerPreview | null => {
-    const boatAnimals = getAnimalsAt('boat');
-
-    if (boatAnimals.length === 0) return null;
-
-    // Simulate the move
-    const newState = { ...gameState };
-    const destination = boatPosition === 'left' ? 'right' : 'left';
-
-    if (destination === 'left') {
-      newState.leftSheep += gameState.boatSheep;
-      newState.leftLions += gameState.boatLions;
-    } else {
-      newState.rightSheep += gameState.boatSheep;
-      newState.rightLions += gameState.boatLions;
-    }
-
-    newState.boatSheep = 0;
-    newState.boatLions = 0;
-
-    const leftDanger = areSheepEaten(newState.leftSheep, newState.leftLions);
-    const rightDanger = areSheepEaten(newState.rightSheep, newState.rightLions);
-
-    if (leftDanger || rightDanger) {
-      return {
-        leftInDanger: leftDanger,
-        rightInDanger: rightDanger,
-        reason: 'Sheep would be eaten on this side!',
-      };
-    }
-
     return null;
-  }, [gameState, boatPosition, getAnimalsAt]);
+  }, []);
 
   // Check if an animal would be in danger - memoized
   const isAnimalInDanger = useCallback(
