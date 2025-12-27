@@ -100,6 +100,10 @@ export const wouldMoveBeValid = (
     newState.boatPosition = 'right' as Position;
   }
 
+  // Clear the boat after moving animals
+  newState.boatSheep = 0;
+  newState.boatLions = 0;
+
   // Check if this move would cause sheep to be eaten
   if (checkGameOver(newState)) {
     return {
