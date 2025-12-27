@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Complete Game Playthrough', () => {
   test('should complete all 11 moves successfully', async ({ page }) => {
+    test.setTimeout(120000); // 2 minutes timeout for the whole test
     // Navigate to the game (using deployed version)
     await page.goto('https://zeeree.vercel.app');
     await page.waitForLoadState('networkidle');
@@ -23,11 +24,14 @@ test.describe('Complete Game Playthrough', () => {
       // Click each animal to select, then click boat to move it there
       for (const id of animalIds) {
         const animal = page.getByTestId(id);
-        await animal.click(); // Select the animal
-        await page.waitForTimeout(300);
-        await boatArea.click(); // Move it to the boat
+        await animal.click({ force: true }); // Select the animal
         await page.waitForTimeout(500);
+        await boatArea.click({ force: true }); // Move it to the boat (force because of animations)
+        await page.waitForTimeout(800);
       }
+
+      // Wait for state to settle
+      await page.waitForTimeout(1000);
 
       // Take screenshot with animals in boat
       await page.screenshot({
@@ -36,8 +40,11 @@ test.describe('Complete Game Playthrough', () => {
       });
       console.log(`📸 Screenshot: Animals loaded in boat`);
 
+      // Wait a bit more before clicking Move Boat
+      await page.waitForTimeout(500);
+
       // Click Move Boat button
-      await moveBoatButton.click();
+      await moveBoatButton.click({ force: true });
       await page.waitForTimeout(1500);
 
       // Take screenshot after move

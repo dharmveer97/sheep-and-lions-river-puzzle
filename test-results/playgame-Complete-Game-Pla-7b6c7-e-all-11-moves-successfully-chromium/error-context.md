@@ -12,30 +12,34 @@
           - img [ref=e15]
           - img [ref=e31]
           - img [ref=e47]
-          - img [ref=e63]
-          - img [ref=e87]
-          - img [ref=e111]
-        - generic [ref=e133]:
-          - generic [ref=e134]: 🐑 3
-          - generic [ref=e135]: 🦁 3
-      - generic [ref=e136]:
-        - heading "🌊 RIVER" [level=2] [ref=e137]
-        - generic [ref=e138] [cursor=pointer]:
+          - img [ref=e71]
+          - img [ref=e95]
+        - generic [ref=e117]:
+          - generic [ref=e118]: 🐑 2
+          - generic [ref=e119]: 🦁 3
+      - generic [ref=e120]:
+        - heading "🌊 RIVER" [level=2] [ref=e121]
+        - generic [ref=e122] [cursor=pointer]:
           - generic:
             - img
-          - generic [ref=e139]: 🚤
-          - generic [ref=e141]:
-            - generic [ref=e142]: 👆
-            - generic [ref=e143]: Tap animals to add
-          - generic [ref=e144]: 🌊 0/2
-        - generic [ref=e145]: "At: LEFT"
-      - generic [ref=e146] [cursor=pointer]:
-        - heading "GOAL ➡️" [level=2] [ref=e148]
-        - generic [ref=e150]:
-          - generic [ref=e151]: 🐑 0
-          - generic [ref=e152]: 🦁 0
-    - generic [ref=e154]:
-      - button "⛔ Add animals to boat first" [disabled] [ref=e155]
-      - button "🔄 Reset" [ref=e156]
-  - alert [ref=e157]
+          - generic [ref=e123]: 🚤
+          - img [ref=e127]
+          - generic [ref=e141]: ⚓ 1/2
+        - generic [ref=e142]: "At: LEFT"
+      - generic [ref=e143] [cursor=pointer]:
+        - heading "GOAL ➡️" [level=2] [ref=e145]
+        - generic [ref=e147]:
+          - generic [ref=e148]: 🐑 0
+          - generic [ref=e149]: 🦁 0
+    - generic [ref=e151]:
+      - button "🚤 Move Boat → RIGHT" [disabled] [ref=e152]
+      - button "🔄 Reset" [ref=e153]
+    - generic [ref=e155]:
+      - generic [ref=e156]: 😱
+      - heading "💀 Game Over! 💀" [level=2] [ref=e157]
+      - paragraph [ref=e158]:
+        - text: Oh no! The sheep were eaten by the lions!
+        - text: Try a different strategy! 🤔
+      - button "🔄 Try Again" [ref=e159]
+  - alert [ref=e160]
 ```

@@ -137,6 +137,15 @@ export function useGameLogic() {
   useEffect(() => {
     if (gameStatus !== 'playing') return;
 
+    // CRITICAL FIX: Only check game over when boat is EMPTY
+    // This prevents false game-over detection while animals are being loaded
+    const boatHasAnimals = gameState.boatSheep > 0 || gameState.boatLions > 0;
+
+    if (boatHasAnimals) {
+      console.log('⏸️  Skipping check - animals still in boat');
+      return;
+    }
+
     // Log every state change for debugging
     console.log('🔍 AUTO CHECK - Current game state:');
     console.log(
