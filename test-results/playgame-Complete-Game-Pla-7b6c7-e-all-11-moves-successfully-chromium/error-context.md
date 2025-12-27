@@ -1,0 +1,41 @@
+# Page snapshot
+
+```yaml
+- generic [active]:
+  - generic [ref=e1]:
+    - heading "🚣 River Crossing Puzzle" [level=1] [ref=e3]
+    - generic [ref=e6]: 👆 Tap animals, move to boat, cross river →
+    - generic [ref=e8]:
+      - generic [ref=e9] [cursor=pointer]:
+        - heading "⬅️ START" [level=2] [ref=e11]
+        - generic [ref=e12]:
+          - img [ref=e15]
+          - img [ref=e31]
+          - img [ref=e47]
+          - img [ref=e63]
+          - img [ref=e87]
+          - img [ref=e111]
+        - generic [ref=e133]:
+          - generic [ref=e134]: 🐑 3
+          - generic [ref=e135]: 🦁 3
+      - generic [ref=e136]:
+        - heading "🌊 RIVER" [level=2] [ref=e137]
+        - generic [ref=e138] [cursor=pointer]:
+          - generic:
+            - img
+          - generic [ref=e139]: 🚤
+          - generic [ref=e141]:
+            - generic [ref=e142]: 👆
+            - generic [ref=e143]: Tap animals to add
+          - generic [ref=e144]: 🌊 0/2
+        - generic [ref=e145]: "At: LEFT"
+      - generic [ref=e146] [cursor=pointer]:
+        - heading "GOAL ➡️" [level=2] [ref=e148]
+        - generic [ref=e150]:
+          - generic [ref=e151]: 🐑 0
+          - generic [ref=e152]: 🦁 0
+    - generic [ref=e154]:
+      - button "⛔ Add animals to boat first" [disabled] [ref=e155]
+      - button "🔄 Reset" [ref=e156]
+  - alert [ref=e157]
+```

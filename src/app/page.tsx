@@ -159,6 +159,7 @@ export default function RiverCrossingGame() {
     return (
       <motion.div
         key={animal.id}
+        data-testid={animal.id}
         draggable={gameStatus === 'playing'}
         onDragStart={() => handleDragStart(animal)}
         onClick={e => {
@@ -396,6 +397,7 @@ export default function RiverCrossingGame() {
 
             {/* Boat */}
             <motion.div
+              data-testid="boat-area"
               className={cn(
                 'bg-gradient-to-br from-amber-500 via-amber-600 to-amber-800 rounded-3xl p-6 border-4 w-full flex flex-col items-center justify-center z-10 relative shadow-2xl cursor-pointer touch-manipulation min-h-[250px]',
                 boatAnimals.length === 0
@@ -543,6 +545,7 @@ export default function RiverCrossingGame() {
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <motion.button
+            data-testid="move-boat-button"
             onClick={handleMoveBoat}
             disabled={
               gameStatus !== 'playing' || isPending || boatAnimals.length === 0
