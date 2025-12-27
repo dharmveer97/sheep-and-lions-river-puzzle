@@ -43,9 +43,7 @@ export default function RiverCrossingGame() {
   // Auto-scroll when boat position changes
   useEffect(() => {
     if (scrollContainerRef.current) {
-      const scrollToElement = (
-        element: HTMLDivElement | null | undefined
-      ) => {
+      const scrollToElement = (element: HTMLDivElement | null | undefined) => {
         if (element) {
           element.scrollIntoView({
             behavior: 'smooth',

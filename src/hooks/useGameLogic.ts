@@ -1,4 +1,10 @@
-import { useState, useMemo, useEffect, useTransition, useCallback } from 'react';
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useTransition,
+  useCallback,
+} from 'react';
 import { GameState, AnimalType } from '@/types/game';
 import {
   checkGameOver,
@@ -144,7 +150,7 @@ export function useGameLogic() {
 
     if (checkWinCondition(gameState)) {
       console.log('🎉 WIN DETECTED!', gameState);
-      setGameStatus('won');
+      setTimeout(() => setGameStatus('won'), 0);
     } else if (checkGameOver(gameState)) {
       console.log('💀 LOSS DETECTED!');
       console.log('Game State:', gameState);
@@ -155,7 +161,7 @@ export function useGameLogic() {
       console.log(
         `RIGHT: ${gameState.rightSheep}🐑 ${gameState.rightLions}🦁 - Eaten: ${areSheepEaten(gameState.rightSheep, gameState.rightLions)}`
       );
-      setGameStatus('lost');
+      setTimeout(() => setGameStatus('lost'), 0);
     } else {
       console.log('✅ State is safe, continuing play');
     }
